@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 
 import Video from 'react-native-video';
+import DRMType from 'react-native-video';
 
 
 
@@ -23,12 +24,16 @@ class VideoPlayer extends Component {
     volume: 1,
     muted: false,
     resizeMode: 'contain',
+    isDownloading: false,
     duration: 0.0,
     currentTime: 0.0,
     paused: true,
   };
 
   video: Video;
+
+ 
+
   onLoad = (data) => {
     this.setState({ duration: data.duration });
   };
@@ -81,6 +86,18 @@ class VideoPlayer extends Component {
     )
   }
 
+downloadOtherMedia(isDownloading) {
+    const isSelected = (this.state.isDownloading === isDownloading);
+
+    return (
+      <TouchableOpacity onPress={() => { this.setState({  isDownloading: !this.state.isDownloading }) }}>
+        <Text style={styles.controlOption}>
+          {isSelected? "Downloading":"Download"}
+        </Text>
+      </TouchableOpacity>
+    )
+  }
+
   renderVolumeControl(volume) {
     const isSelected = (this.state.volume === volume);
 
@@ -106,27 +123,25 @@ class VideoPlayer extends Component {
           <Video
             ref={(ref: Video) => { this.video = ref }}
             /* For ExoPlayer */
-             source={{ uri: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', type: 'mp3' }} 
+            source={{
+              
+    
+              
+              //Testing WIDEVINE
+              
+              uri: 'https://swannmediaservice-euwe.streaming.media.azure.net/04f2a65e-05d7-43e8-bfe0-a0b871d1af60/file_example_MP3_2MGx.ism/manifest(format=mpd-time-csf,encryption=cenc)',type:'mpd'
+              }}
+              drm={{
+              type: 'widevine', //or DRMType.WIDEVINE
+              //zedt license server mta3 shakaplayer
+              licenseServer: 'https://widevine-proxy.appspot.com/proxy',
+              }}
+          
+             
+             
            // source={require('./broadchurch.mp4')}
-            style={styles.fullScreen}
-            rate={this.state.rate}
-            paused={this.state.paused}
-            volume={this.state.volume}
-            muted={this.state.muted}
-            resizeMode={this.state.resizeMode}
-            onLoad={this.onLoad}
-            onProgress={this.onProgress}
-            onEnd={this.onEnd}
-            onAudioBecomingNoisy={this.onAudioBecomingNoisy}
-            onAudioFocusChanged={this.onAudioFocusChanged}
-            repeat={false}
-            ignoreSilentSwitch={"ignore"}
-            playWhenInactive={true}
-            playInBackground={true}
-          />
-        </TouchableOpacity>
-
-        <View style={styles.controls}>
+/*
+           <View style={styles.controls}>
           <View style={styles.generalControls}>
             <View style={styles.rateControl}>
               {this.renderRateControl(0.25)}
@@ -142,10 +157,15 @@ class VideoPlayer extends Component {
               {this.renderVolumeControl(1.5)}
             </View>
 
+            <View style={styles.volumeControl}>
+            {this.downloadOtherMedia(true)}
+            </View>
+
             <View style={styles.resizeModeControl}>
               {this.renderResizeModeControl('cover')}
               {this.renderResizeModeControl('contain')}
               {this.renderResizeModeControl('stretch')}
+              
             </View>
           </View>
 
@@ -155,7 +175,29 @@ class VideoPlayer extends Component {
               <View style={[styles.innerProgressRemaining, { flex: flexRemaining }]} />
             </View>
           </View>
-        </View>
+        </View></View>*/
+            style={styles.fullScreen}
+            rate={this.state.rate}
+            controls={true}
+            paused={this.state.paused}
+            volume={this.state.volume}
+            muted={this.state.muted}
+            resizeMode={this.state.resizeMode}
+            isDownloading={this.state.isDownloading}
+            onLoad={this.onLoad}
+            onProgress={this.onProgress}
+            onEnd={this.onEnd}
+            onAudioBecomingNoisy={this.onAudioBecomingNoisy}
+            onAudioFocusChanged={this.onAudioFocusChanged}
+            repeat={false}
+            ignoreSilentSwitch={"ignore"}
+            playWhenInactive={true}
+            playInBackground={true}
+          />
+        </TouchableOpacity>
+    
+
+        
       </View>
     );
   }
